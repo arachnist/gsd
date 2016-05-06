@@ -54,11 +54,11 @@ func spawnUpdater(pos, period int, args map[string]string, f func(map[string]str
 }
 
 func timestamp(args map[string]string) string {
-	return "placeholder"
+	return "placeholderStamp"
 }
 
 func fileReader(args map[string]string) string {
-	return "placeholder"
+	return "placeholderFile"
 }
 
 func main() {
@@ -75,4 +75,11 @@ func main() {
 		log.Fatalln("Error parsing configuration file:", err)
 	}
 
+	statusbar = make([]string, len(config.Items))
+
+	for i, item := range config.Items {
+		spawnUpdater(i, item.Period, item.Args, fileReader)
+	}
+
+	time.Sleep(time.Duration(10) * time.Second)
 }
