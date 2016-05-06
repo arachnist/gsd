@@ -16,7 +16,6 @@ import (
 	"log"
 	"os"
 	"strings"
-	"sync"
 	"time"
 )
 
@@ -33,25 +32,7 @@ type gsdConfig struct {
 }
 
 var config gsdConfig
-var statusLock sync.Mutex
 var statusbar []string
-
-func updateStatusbar(pos int, text string) {
-	statusLock.Lock()
-	defer statusLock.Unlock()
-
-	statusbar[pos] = text
-	C.xname(C.CString(strings.Join(statusbar, config.Separator)))
-}
-
-func spawnUpdater(pos, period int, args map[string]string, f func(map[string]string) string) {
-	go func() {
-		for {
-			time.Sleep(time.Duration(period) * time.Second)
-			updateStatusbar(pos, f(args))
-		}
-	}()
-}
 
 func timestamp(args map[string]string) string {
 	return time.Now().Format(args["format"])
@@ -69,8 +50,6 @@ func fileReader(args map[string]string) string {
 }
 
 func main() {
-	var exit chan struct{}
-
 	if len(os.Args) < 2 {
 		log.Fatalln("Usage:", os.Args[0], "<configuration file>")
 	}
@@ -86,16 +65,19 @@ func main() {
 
 	statusbar = make([]string, len(config.Items))
 
-	for i, item := range config.Items {
-		switch item.Type {
-		case "fileReader":
-			spawnUpdater(i, item.Period, item.Args, fileReader)
-		case "timestamp":
-			spawnUpdater(i, item.Period, item.Args, timestamp)
-		default:
-			log.Fatalln("Unknown item type", item.Type)
+	for {
+		for pos, item := range config.Items {
+			switch item.Type {
+			case "fileReader":
+				statusbar[pos] = fileReader(item.Args)
+			case "timestamp":
+				statusbar[pos] = timestamp(item.Args)
+			default:
+				log.Fatalln("Unknown item type", item.Type)
+			}
 		}
-	}
 
-	<-exit
+		C.xname(C.CString(strings.Join(statusbar, config.Separator)))
+		time.Sleep(time.Duration(1) * time.Second)
+	}
 }
