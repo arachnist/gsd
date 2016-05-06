@@ -1,6 +1,26 @@
 ---
 separator: " | "
 items:
+    - name: cpu_temp
+      period: 5
+      type: fileReader
+      args:
+          path: /sys/class/hwmon/hwmon1/temp1_input
+          format: "%.2s C"
+
+    - name: power_state
+      period: 10
+      type: fileReader
+      args:
+          path: /sys/devices/LNXSYSTM:00/LNXSYBUS:00/PNP0C0A:00/power_supply/BAT0/status
+
+    - name: power_level
+      period: 10
+      type: fileReader
+      args:
+          path: /sys/devices/LNXSYSTM:00/LNXSYBUS:00/PNP0C0A:00/power_supply/BAT0/capacity
+          unit: "%"
+
     - name: load
       period: 5
       type: fileReader
@@ -8,29 +28,8 @@ items:
           path: /proc/loadavg
           range: 0..2
 
-    - name: power_level
-      period: 5
-      type: fileReader
-      args:
-          path: /sys/devices/LNXSYSTM:00/LNXSYBUS:00/PNP0C0A:00/power_supply/BAT0/capacity
-          unit: "%"
-
-    - name: power_state
-      period: 1
-      type: fileReader
-      args:
-          path: /sys/devices/LNXSYSTM:00/LNXSYBUS:00/PNP0C0A:00/power_supply/BAT0/status
-          unit: ""
-
-    - name: cpu_temp
-      period: 1
-      type: fileReader
-      args:
-          path: /sys/class/hwmon/hwmon1/temp1_input
-          format: "%.2s C"
-
     - name: datetime
-      period: 1
+      period: 30
       type: timestamp
       args:
-          format: "2006-01-02 15:04:05"
+          format: "2006-01-02 15:04"
