@@ -54,7 +54,7 @@ func spawnUpdater(pos, period int, args map[string]string, f func(map[string]str
 }
 
 func timestamp(args map[string]string) string {
-	return "placeholderStamp"
+	return time.Now().Format(args["format"])
 }
 
 func fileReader(args map[string]string) string {
@@ -62,6 +62,8 @@ func fileReader(args map[string]string) string {
 }
 
 func main() {
+	var exit chan struct{}
+
 	if len(os.Args) < 2 {
 		log.Fatalln("Usage:", os.Args[0], "<configuration file>")
 	}
@@ -78,8 +80,15 @@ func main() {
 	statusbar = make([]string, len(config.Items))
 
 	for i, item := range config.Items {
-		spawnUpdater(i, item.Period, item.Args, fileReader)
+		switch item.Type {
+		case "fileReader":
+			spawnUpdater(i, item.Period, item.Args, fileReader)
+		case "timestamp":
+			spawnUpdater(i, item.Period, item.Args, timestamp)
+		default:
+			log.Fatalln("Unknown item type", item.Type)
+		}
 	}
 
-	time.Sleep(time.Duration(10) * time.Second)
+	<-exit
 }

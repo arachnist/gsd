@@ -1,12 +1,6 @@
 ---
 separator: " | "
 items:
-    - name: datetime
-      period: 1
-      type: timestamp
-      args:
-          format: "%Y-%m-%d %H:%M:%S"
-
     - name: load
       period: 5
       type: fileReader
@@ -34,3 +28,9 @@ items:
       args:
           path: /sys/class/hwmon/hwmon1/temp1_input
           format: "%.2s C"
+
+    - name: datetime
+      period: 1
+      type: timestamp
+      args:
+          format: "2006-01-02 15:04:05"
