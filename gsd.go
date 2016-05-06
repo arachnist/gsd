@@ -58,7 +58,14 @@ func timestamp(args map[string]string) string {
 }
 
 func fileReader(args map[string]string) string {
-	return "placeholderFile"
+	buf, err := ioutil.ReadFile(args["path"])
+	if err != nil {
+		log.Println("Error reading", args["path"], err)
+		return ""
+	}
+	content := string(buf)
+
+	return content
 }
 
 func main() {
