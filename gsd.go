@@ -65,15 +65,17 @@ func main() {
 
 	statusbar = make([]string, len(config.Items))
 
-	for {
+	for i := 0; i > -1; i++ {
 		for pos, item := range config.Items {
-			switch item.Type {
-			case "fileReader":
-				statusbar[pos] = fileReader(item.Args)
-			case "timestamp":
-				statusbar[pos] = timestamp(item.Args)
-			default:
-				log.Fatalln("Unknown item type", item.Type)
+			if (i % item.Period) == 0 {
+				switch item.Type {
+				case "fileReader":
+					statusbar[pos] = fileReader(item.Args)
+				case "timestamp":
+					statusbar[pos] = timestamp(item.Args)
+				default:
+					log.Fatalln("Unknown item type", item.Type)
+				}
 			}
 		}
 
