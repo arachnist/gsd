@@ -28,7 +28,7 @@ type statusbarItem struct {
 }
 
 type gsdConfig struct {
-	Separator string          `yaml:"string"`
+	Separator string          `yaml:"separator"`
 	Items     []statusbarItem `yaml:"items"`
 }
 
