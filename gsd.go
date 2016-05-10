@@ -11,6 +11,7 @@ package main
 import "C"
 
 import (
+	"fmt"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
@@ -44,7 +45,11 @@ func fileReader(args map[string]string) string {
 		log.Println("Error reading", args["path"], err)
 		return ""
 	}
-	content := string(buf)
+	content := strings.TrimSpace(string(buf))
+
+	if args["format"] != "" {
+		content = fmt.Sprintf(args["format"], content)
+	}
 
 	return content
 }

@@ -6,7 +6,7 @@ items:
       type: fileReader
       args:
           path: /sys/class/hwmon/hwmon1/temp1_input
-          format: "%.2s C"
+          format: "%.2s°C"
 
     - name: power_state
       period: 10
@@ -19,7 +19,7 @@ items:
       type: fileReader
       args:
           path: /sys/devices/LNXSYSTM:00/LNXSYBUS:00/PNP0C0A:00/power_supply/BAT0/capacity
-          unit: "%"
+          format: "%s%%"
 
     - name: load
       period: 5
@@ -29,7 +29,7 @@ items:
           range: 0..2
 
     - name: datetime
-      period: 30
+      period: 1
       type: timestamp
       args:
-          format: "2006-01-02 15:04"
+          format: "2006-01-02 15:04:05"
