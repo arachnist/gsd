@@ -38,6 +38,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -71,6 +72,12 @@ func fileReader(args map[string]string) string {
 
 	if args["format"] != "" {
 		content = fmt.Sprintf(args["format"], content)
+	}
+
+	if args["range_from"] != "" && args["range_to"] != "" && args["separator"] != "" {
+		from, _ := strconv.Atoi(args["range_from"])
+		to, _ := strconv.Atoi(args["range_to"])
+		content = strings.Join(strings.Split(content, args["separator"])[from:to], args["separator"])
 	}
 
 	return content
