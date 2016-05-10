@@ -5,8 +5,30 @@
 package main
 
 /*
-#cgo LDFLAGS: -lxname
-#include <xname.h>
+// taken directly from https://github.com/Igneous/libxname/blob/master/xname.c
+#cgo LDFLAGS: -lX11
+#include <X11/Xlib.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+int xname(const char *msg) {
+	Display *dpy;
+	Window rootwin;
+	int scr;
+
+	if(!(dpy=XOpenDisplay(NULL))) {
+		fprintf(stderr, "ERROR: could not open display\n");
+		exit(1);
+	}
+
+	scr = DefaultScreen(dpy);
+	rootwin = RootWindow(dpy, scr);
+
+	XStoreName(dpy, rootwin, msg);
+	XCloseDisplay(dpy);
+
+	return 0;
+}
 */
 import "C"
 
