@@ -70,7 +70,7 @@ func main() {
 
 	statusbar = make([]string, len(config.Items))
 
-	for i := 0; i > -1; i++ {
+	for i := 0; ; i++ {
 		for pos, item := range config.Items {
 			if (i % item.Period) == 0 {
 				switch item.Type {
