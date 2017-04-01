@@ -33,14 +33,18 @@ int xname(const char *msg) {
 import "C"
 
 import (
+	"flag"
 	"fmt"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
 	"os"
+	"path"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/mdlayher/wifi"
 )
 
 type statusbarItem struct {
@@ -83,18 +87,48 @@ func fileReader(args map[string]string) string {
 	return content
 }
 
-func main() {
-	if len(os.Args) < 2 {
-		log.Fatalln("Usage:", os.Args[0], "<configuration file>")
+func wifiSSID(wifiClient *wifi.Client, args map[string]string) string {
+	ifaces, err := wifiClient.Interfaces()
+	if err != nil {
+		return err.Error()
 	}
 
-	data, err := ioutil.ReadFile(os.Args[1])
+	for _, iface := range ifaces {
+		if iface.Name == args["interface"] {
+			bss, err := wifiClient.BSS(iface)
+			if err != nil {
+				return err.Error()
+			}
+
+			return bss.SSID
+		}
+	}
+	return "NOPE"
+}
+
+var configPath string
+var wifiFlag bool
+
+func init() {
+	flag.StringVar(&configPath, "config", path.Join(os.Getenv("HOME"), ".gsd.conf.yaml"), "configuration file path")
+	flag.BoolVar(&wifiFlag, "wifi", true, "enable wifi status")
+}
+
+func main() {
+	flag.Parse()
+	var wifiClient *wifi.Client
+
+	data, err := ioutil.ReadFile(configPath)
 	if err != nil {
 		log.Fatalln("Error reading configuration file:", err)
 	}
 
 	if err := yaml.Unmarshal(data, &config); err != nil {
 		log.Fatalln("Error parsing configuration file:", err)
+	}
+
+	if wifiFlag {
+		wifiClient, err = wifi.New()
 	}
 
 	statusbar = make([]string, len(config.Items))
@@ -107,6 +141,12 @@ func main() {
 					statusbar[pos] = fileReader(item.Args)
 				case "timestamp":
 					statusbar[pos] = timestamp(item.Args)
+				case "wifi_ssid":
+					if wifiFlag {
+						statusbar[pos] = wifiSSID(wifiClient, item.Args)
+					} else {
+						statusbar[pos] = "NOPE"
+					}
 				default:
 					log.Fatalln("Unknown item type", item.Type)
 				}
